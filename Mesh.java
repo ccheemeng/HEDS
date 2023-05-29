@@ -108,6 +108,45 @@ public class Mesh {
         this.edges = newEdges;
     }
 
+    public void check() {
+        for (HalfEdge e : this.edges) {
+            if (e.getTwin().isPresent() &&
+                    !e.equals(e.getTwin().get().getTwin().get())) {
+                throw new Error("edge: twin inconsistent");
+            }
+            if (e.getNext().isPresent() &&
+                    !e.getFace().equals(e.getNext().get().getFace())) {
+                throw new Error("edge: next face inconsistent");
+            }
+            if (e.getPrev().isPresent() &&
+                    !e.getFace().equals(e.getPrev().get().getFace())) {
+                throw new Error("edge: prev face inconsistent");
+            }
+            if (e.getPrev().isPresent() &&
+                    !e.equals(e.getPrev().get().getNext().get())) {
+                throw new Error("edge: next inconsistent");
+            }
+            if (e.getNext().isPresent() &&
+                    !e.equals(e.getNext().get().getPrev().get())) {
+                throw new Error("edge: prev inconsistent");
+            }
+        }
+
+        for (Vertex v : this.vertices) {
+            if (v.getHalfEdge().isPresent() &&
+                    !v.equals(((HalfEdge) v.getHalfEdge().get()).getVertex().get())) {
+                throw new Error("vertex: edge inconsistent");
+            }
+        }
+
+        for (Face f : this.faces) {
+            if (f.getHalfEdge().isPresent() &&
+                    !f.equals(((HalfEdge) f.getHalfEdge().get()).getFace().get())) {
+                throw new Error("face: edge inconsistent");
+            }
+        }
+    }
+
     @Override
     public String toString() {
         String output = "";
