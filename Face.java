@@ -21,13 +21,14 @@ class Face {
         return this.id;
     }
 
-    Optional<IHalfEdge> getHalfEdge() {
+    public Optional<IHalfEdge> getHalfEdge() {
         return this.halfedge;
     }
 
     @Override
     public String toString() {
+        IHalfEdge edge = () -> -1;
         return String.format("Face %d: Edge %d", this.id,
-                this.halfedge.orElse(new HalfEdge(-1)).getId());
+                this.halfedge.orElse(edge).getId());
     }
 }

@@ -27,17 +27,18 @@ class Vertex {
         return this.id;
     }
 
-    Point getPoint() {
+    public Point getPoint() {
         return this.p;
     }
 
-    Optional<IHalfEdge> getHalfEdge() {
+    public Optional<IHalfEdge> getHalfEdge() {
         return this.halfedge;
     }
 
     @Override
     public String toString() {
+        IHalfEdge edge = () -> -1;
         return String.format("Vertex %d: %s, Edge %d", this.id, this.p.toString(),
-                this.halfedge.orElse(new HalfEdge(-1)).getId());
+                this.halfedge.orElse(edge).getId());
     }
 }

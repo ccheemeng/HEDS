@@ -1,5 +1,7 @@
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Derived from
@@ -145,6 +147,30 @@ public class Mesh {
                 throw new Error("face: edge inconsistent");
             }
         }
+    }
+
+    public List<Vertex> getVertices() {
+        ArrayList<Vertex> vertices = new ArrayList<Vertex>();
+        for (Vertex v : this.vertices) {
+            vertices.add(v);
+        }
+        return Collections.unmodifiableList(vertices);
+    }
+
+    public List<Face> getFaces() {
+        ArrayList<Face> faces = new ArrayList<Face>();
+        for (Face f : this.faces) {
+            faces.add(f);
+        }
+        return Collections.unmodifiableList(faces);
+    }
+
+    public List<HalfEdge> getHalfEdge() {
+        ArrayList<HalfEdge> edges = new ArrayList<HalfEdge>();
+        for (HalfEdge e : this.edges) {
+            edges.add(e);
+        }
+        return Collections.unmodifiableList(edges);
     }
 
     @Override
