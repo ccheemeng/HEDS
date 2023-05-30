@@ -9,6 +9,11 @@ class Face {
         this.halfedge = Optional.<IHalfEdge>empty();
     }
 
+    private Face(int id, Optional<IHalfEdge> halfedge) {
+        this.id = id;
+        this.halfedge = halfedge;
+    }
+
     void setHalfEdge(IHalfEdge halfedge) {
         this.halfedge = Optional.<IHalfEdge>of(halfedge);
     }

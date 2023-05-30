@@ -2,6 +2,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.lang.IndexOutOfBoundsException;
 
 /**
  * Derived from
@@ -110,6 +111,12 @@ public class Mesh {
         this.edges = newEdges;
     }
 
+    private Mesh(ImList<Vertex> vertices, ImList<Face> faces, ImList<HalfEdge> edges) {
+        this.vertices = vertices;
+        this.faces = faces;
+        this.edges = edges;
+    }
+
     public void check() {
         for (HalfEdge e : this.edges) {
             if (e.getTwin().isPresent() &&
@@ -146,6 +153,48 @@ public class Mesh {
                     !f.equals(((HalfEdge) f.getHalfEdge().get()).getFace().get())) {
                 throw new Error("face: edge inconsistent");
             }
+        }
+    }
+
+    public Mesh moveVertex(int i, Point p) {
+        try {
+            Vertex v = this.vertices.get(i);
+        } catch (IndexOutOfBoundsException e) {
+            System.out.println("no such vertex found");
+            return this;
+        }
+        Vertex v = this.vertices.get(i);
+        Mesh mesh = new Mesh(this.vertices.set(i, v.move(p)),
+                this.faces, this.edges);
+        mesh.updateReferences();
+        try {
+            mesh.check();
+        } catch (Error e) {
+            System.out.println("move creates an invalid mesh");
+            System.out.println(e);
+            return this;
+        }
+        return mesh;
+    }
+
+    private void updateReferences() {
+        for (Vertex v : this.vertices) {
+            int i = v.getId();
+            this.vertices.get(i).setHalfEdge(this.edges.get(((HalfEdge)v.getHalfEdge().get()).getId()));
+        }
+        for (Face f : this.faces) {
+            int i = f.getId();
+            this.faces.get(i).setHalfEdge(this.edges.get(((HalfEdge)f.getHalfEdge().get()).getId()));
+        }
+        for (HalfEdge e : this.edges) {
+            HalfEdge he = this.edges.get(e.getId());
+            he.setVertex(this.vertices.get(e.getVertex().get().getId()));
+            he.setTwin(this.edges.get(e.getTwin().get().getId()));
+            if (e.getFace().isPresent()) {
+                he.setFace(this.faces.get(e.getFace().get().getId()));
+            }
+            he.setNext(this.edges.get(e.getNext().get().getId()));
+            he.setPrev(this.edges.get(e.getPrev().get().getId()));
         }
     }
 

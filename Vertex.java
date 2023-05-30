@@ -19,7 +19,7 @@ class Vertex {
         this.halfedge = Optional.<IHalfEdge>of(halfedge);
     }
 
-    Vertex setPoint(Point p) {
+    Vertex move(Point p) {
         return new Vertex(this.id, p, this.halfedge); 
     }
 
