@@ -211,9 +211,11 @@ public class Mesh {
         oldEdge1.setNext(newEdge1);
         oldEdge2.getPrev().get().setNext(newEdge2);
         oldEdge2.setPrev(newEdge2);
+        oldEdge2.getVertex().get().setHalfEdge(newEdge2);
         oldEdge2.setVertex(newVertex);
         mesh = new Mesh(mesh.vertices.add(newVertex), mesh.faces,
                 mesh.edges.addAll(List.of(newEdge1, newEdge2)));
+        mesh.check();
         return mesh;
     }
 
