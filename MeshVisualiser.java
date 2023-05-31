@@ -3,7 +3,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 class MeshVisualiser {
-    public static void visualise(Mesh m) {
+    public MeshVisualiser(Mesh m) {
         m.check();
         String output = "";
         ImList<Face> faces = new ImList<Face>(m.getFaces());
@@ -27,5 +27,6 @@ class MeshVisualiser {
         } catch (IOException e) {
             System.out.println("Error! Could not write output");
         }
+        return;
     }
 }
