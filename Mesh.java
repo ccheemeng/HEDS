@@ -158,15 +158,14 @@ public class Mesh {
 
     public Mesh moveVertex(int i, Point p) {
         try {
-            Vertex v = this.vertices.get(i);
+            this.vertices.get(i);
         } catch (IndexOutOfBoundsException e) {
             System.out.println("no such vertex found");
             return this;
         }
         Vertex v = this.vertices.get(i);
         Mesh mesh = new Mesh(this.vertices.set(i, v.move(p)),
-                this.faces, this.edges);
-        mesh.updateReferences();
+                this.faces, this.edges).copy();
         try {
             mesh.check();
         } catch (Error e) {
@@ -177,25 +176,81 @@ public class Mesh {
         return mesh;
     }
 
-    private void updateReferences() {
+    public Mesh splitEdgeAddVertex(int edgeIndex, Point vertexPoint) {
+        try {
+            this.edges.get(edgeIndex);
+        } catch (IndexOutOfBoundsException e) {
+            return this;
+        }
+        Vertex newVertex = new Vertex(this.vertices.size(), vertexPoint);
+        Mesh mesh = this.copy();
+        HalfEdge newEdge1 = new HalfEdge(this.edges.size());
+        HalfEdge newEdge2 = new HalfEdge(this.edges.size() + 1);
+        HalfEdge oldEdge1 = mesh.edges.get(edgeIndex);
+        HalfEdge oldEdge2 = oldEdge1.getTwin().get();
+       
+        newVertex.setHalfEdge(newEdge1);
+
+        newEdge1.setNext(oldEdge1.getNext());
+        newEdge1.setPrev(oldEdge1);
+        newEdge1.setTwin(newEdge2);
+        newEdge1.setVertex(newVertex);
+        if (oldEdge1.getFace().isPresent()) {
+            newEdge1.setFace(oldEdge1.getFace().get());
+        }
+
+        newEdge2.setPrev(oldEdge2.getPrev());
+        newEdge2.setNext(oldEdge2);
+        newEdge2.setTwin(newEdge1);
+        newEdge2.setVertex(oldEdge2.getVertex().get());
+        if (oldEdge2.getFace().isPresent()) {
+            newEdge2.setFace(oldEdge2.getFace().get());
+        }
+        
+        oldEdge1.getNext().get().setPrev(newEdge1);
+        oldEdge1.setNext(newEdge1);
+        oldEdge2.getPrev().get().setNext(newEdge2);
+        oldEdge2.setPrev(newEdge2);
+        oldEdge2.setVertex(newVertex);
+        mesh = new Mesh(mesh.vertices.add(newVertex), mesh.faces,
+                mesh.edges.addAll(List.of(newEdge1, newEdge2)));
+        return mesh;
+    }
+
+    public Mesh copy() {
+        ImList<Vertex> vertices = new ImList<Vertex>();
+        ImList<Face> faces = new ImList<Face>();
+        ImList<HalfEdge> edges = new ImList<HalfEdge>();
+        for (Vertex v : this.vertices) {
+            vertices = vertices.add(v.copy());
+        }
+        for (Face f : this.faces) {
+            faces = faces.add(f.copy());
+        }
+        for (HalfEdge e: this.edges) {
+            edges = edges.add(e.copy());
+        }
+        Mesh mesh = new Mesh(vertices, faces, edges);
+        
         for (Vertex v : this.vertices) {
             int i = v.getId();
-            this.vertices.get(i).setHalfEdge(this.edges.get(((HalfEdge)v.getHalfEdge().get()).getId()));
+            mesh.vertices.get(i).setHalfEdge(mesh.edges.get(((HalfEdge)v.getHalfEdge().get()).getId()));
         }
         for (Face f : this.faces) {
             int i = f.getId();
-            this.faces.get(i).setHalfEdge(this.edges.get(((HalfEdge)f.getHalfEdge().get()).getId()));
+            mesh.faces.get(i).setHalfEdge(mesh.edges.get(((HalfEdge)f.getHalfEdge().get()).getId()));
         }
         for (HalfEdge e : this.edges) {
-            HalfEdge he = this.edges.get(e.getId());
-            he.setVertex(this.vertices.get(e.getVertex().get().getId()));
-            he.setTwin(this.edges.get(e.getTwin().get().getId()));
+            HalfEdge he = mesh.edges.get(e.getId());
+            he.setVertex(mesh.vertices.get(e.getVertex().get().getId()));
+            he.setTwin(mesh.edges.get(e.getTwin().get().getId()));
             if (e.getFace().isPresent()) {
-                he.setFace(this.faces.get(e.getFace().get().getId()));
+                he.setFace(mesh.faces.get(e.getFace().get().getId()));
             }
-            he.setNext(this.edges.get(e.getNext().get().getId()));
-            he.setPrev(this.edges.get(e.getPrev().get().getId()));
+            he.setNext(mesh.edges.get(e.getNext().get().getId()));
+            he.setPrev(mesh.edges.get(e.getPrev().get().getId()));
         }
+        return mesh;
     }
 
     public List<Vertex> getVertices() {

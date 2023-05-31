@@ -19,6 +19,10 @@ class Vertex {
         this.halfedge = Optional.<IHalfEdge>of(halfedge);
     }
 
+    Vertex copy() {
+        return new Vertex(this.id, this.p, this.halfedge);
+    }
+
     Vertex move(Point p) {
         return new Vertex(this.id, p, this.halfedge); 
     }

@@ -51,6 +51,11 @@ class HalfEdge implements IHalfEdge {
         this.prev = prev;
     }
 
+    HalfEdge copy() {
+        return new HalfEdge(this.id, this.v, this.f,
+                this.twin, this.next, this.prev);
+    }
+
     public int getId() {
         return this.id;
     }

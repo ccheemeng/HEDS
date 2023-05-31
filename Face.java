@@ -22,6 +22,10 @@ class Face {
         this.halfedge = Optional.<IHalfEdge>empty();
     }
 
+    Face copy() {
+        return new Face(this.id, this.halfedge);
+    }
+
     int getId() {
         return this.id;
     }
