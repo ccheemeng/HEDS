@@ -31,12 +31,54 @@ class Vertex {
         return this.id;
     }
 
-    public Point getPoint() {
+    Point getPoint() {
         return this.p;
     }
 
-    public Optional<HalfEdge> getHalfEdge() {
+    Optional<HalfEdge> getHalfEdge() {
         return this.halfedge;
+    }
+
+    double getX() {
+        return this.p.getX();
+    }
+
+    double getY() {
+        return this.p.getY();
+    }
+
+    Vertex translateCoords(double x, double y) {
+        return new Vertex(this.id,
+                this.p.translateCoords(x, y), this.halfedge);
+    }
+
+    Vertex translateAngle(double angle, double dist) {
+        return new Vertex(this.id,
+                this.p.translateAngle(angle, dist), this.halfedge);
+    }
+
+    double angle() {
+        return this.p.angle();
+    }
+
+    double angleBetween(Vertex other) {
+        return this.p.angleBetween(other.p);
+    }
+
+    double distanceBetween(Vertex other) {
+        return this.p.distanceBetween(other.p);
+    }
+
+    double distanceFromOrigin() {
+        return this.p.distanceFromOrigin();
+    }
+
+    Point midpoint(Vertex other) {
+        return this.p.midpoint(other.p);
+    }
+
+    Point lerp(Vertex other, double ratio) {
+        return this.p.lerp(other.p, ratio);
     }
 
     @Override

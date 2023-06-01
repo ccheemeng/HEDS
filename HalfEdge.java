@@ -80,6 +80,27 @@ class HalfEdge {
         return this.prev;
     }
 
+    double angle() {
+        if (this.next.isEmpty() || this.v.isEmpty() ||
+                this.next.get().v.isEmpty()) {
+            return 2 * Math.PI;
+        }
+        Vertex v1 = this.v.get();
+        Vertex v2 = this.next.get().v.get();
+        return v2.translateAngle(v1.angle() + Math.PI,
+                v1.distanceFromOrigin()).angle();
+    }
+
+    double angleBetween(HalfEdge other) {
+        if (this.next.isEmpty() || this.v.isEmpty() ||
+                this.next.get().v.isEmpty() ||
+                other.next.isEmpty() || other.v.isEmpty() ||
+                other.next.get().v.isEmpty()) {
+            return 2 * Math.PI;
+        }
+        return other.angle() - this.angle();
+    }
+
     @Override
     public String toString() {
         String output = "Edge " + this.id + ": " +
