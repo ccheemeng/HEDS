@@ -6,7 +6,7 @@ class MeshVisualiser {
     public MeshVisualiser(Mesh m) {
         m.check();
         String output = "";
-        ImList<Face> faces = new ImList<Face>(m.getFaces());
+        ImList<Face> faces = m.getFaces();
         for (Face f : faces) {
             HalfEdge start = (HalfEdge) f.getHalfEdge().get();
             HalfEdge curr = start;
