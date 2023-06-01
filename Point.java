@@ -18,6 +18,10 @@ public class Point {
         return String.format("Point(%f, %f)", this.x, this.y);
     }
 
+    public static Point origin() {
+        return new Point(0.0, 0.0);
+    }
+
     public double getX() {
         return this.x;
     }

@@ -101,6 +101,37 @@ class HalfEdge {
         return other.angle() - this.angle();
     }
 
+    double length() {
+        if (this.next.isEmpty() || this.v.isEmpty() ||
+                this.next.get().v.isEmpty()) {
+            return -1.0;
+        }
+        return this.v.get().distanceBetween(
+                this.next.get().v.get());
+    }
+
+    Point midpoint() {
+        if (this.next.isEmpty() || this.next.get().v.isEmpty()) {
+            if (this.v.isEmpty()) {
+                return Point.origin();
+            }
+            return this.v.get().getPoint();
+        }
+        return this.v.get().midpoint(
+                this.next.get().v.get());
+    }
+
+    Point lerp(double ratio) {
+        if (this.next.isEmpty() || this.next.get().v.isEmpty()) {
+            if (this.v.isEmpty()) {
+                return Point.origin();
+            }
+            return this.v.get().getPoint();
+        }
+        return this.v.get().lerp(
+                this.next.get().v.get(), ratio);
+    }
+
     @Override
     public String toString() {
         String output = "Edge " + this.id + ": " +
