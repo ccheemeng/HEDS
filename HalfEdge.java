@@ -1,6 +1,6 @@
 import java.util.Optional;
 
-class HalfEdge implements IHalfEdge {
+class HalfEdge {
     private final int id;
     private Optional<Vertex> v;
     private Optional<Face> f;

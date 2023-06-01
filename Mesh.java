@@ -141,14 +141,14 @@ public class Mesh {
 
         for (Vertex v : this.vertices) {
             if (v.getHalfEdge().isPresent() &&
-                    !v.equals(((HalfEdge) v.getHalfEdge().get()).getVertex().get())) {
+                    !v.equals((v.getHalfEdge().get()).getVertex().get())) {
                 throw new Error("vertex: edge inconsistent");
             }
         }
 
         for (Face f : this.faces) {
             if (f.getHalfEdge().isPresent() &&
-                    !f.equals(((HalfEdge) f.getHalfEdge().get()).getFace().get())) {
+                    !f.equals((f.getHalfEdge().get()).getFace().get())) {
                 throw new Error("face: edge inconsistent");
             }
         }
@@ -172,12 +172,12 @@ public class Mesh {
         for (int i = 0; i < mesh.vertices.size(); ++i) {
             mesh.vertices.get(i).setHalfEdge(
                     mesh.edges.get(this.edges.indexOf(
-                            (HalfEdge)this.vertices.get(i).getHalfEdge().get())));
+                            this.vertices.get(i).getHalfEdge().get())));
         }
         for (int i = 0; i < mesh.faces.size(); ++i) {
             mesh.faces.get(i).setHalfEdge(
                     mesh.edges.get(this.edges.indexOf(
-                            (HalfEdge)this.faces.get(i).getHalfEdge().get())));
+                            this.faces.get(i).getHalfEdge().get())));
         }
         for (int i = 0; i < mesh.edges.size(); ++i) {
             HalfEdge e = mesh.edges.get(i);
@@ -269,7 +269,7 @@ public class Mesh {
         }
         Vertex v = this.vertices.get(i);
         int count = 0;
-        HalfEdge start = (HalfEdge) v.getHalfEdge().get();
+        HalfEdge start = v.getHalfEdge().get();
         HalfEdge curr = start;
         do {
             ++count;
@@ -281,7 +281,7 @@ public class Mesh {
 
         Mesh mesh = this.copy();
         Vertex v2 = mesh.vertices.get(i);
-        HalfEdge v2Out = (HalfEdge) mesh.vertices.get(i).getHalfEdge().get();
+        HalfEdge v2Out = mesh.vertices.get(i).getHalfEdge().get();
         HalfEdge v2In = v2Out.getTwin().get();
         HalfEdge v1Out = v2Out.getPrev().get();
         HalfEdge v1In = v1Out.getTwin().get();
@@ -334,13 +334,13 @@ public class Mesh {
             .get(v1Index).getVertex().get();
         Vertex v2 = getFaceHalfEdges(f)
             .get(v2Index).getVertex().get();
-        HalfEdge v1Out = (HalfEdge) f.getHalfEdge().get();
+        HalfEdge v1Out = f.getHalfEdge().get();
         HalfEdge v1In = v1Out.getPrev().get();
         for (int i = 0; i < v1Index; ++i) {
             v1Out = v1Out.getNext().get();
             v1In = v1Out.getPrev().get();
         }
-        HalfEdge v2Out = (HalfEdge) f.getHalfEdge().get();
+        HalfEdge v2Out = f.getHalfEdge().get();
         HalfEdge v2In = v2Out.getPrev().get();
         for (int i = 0; i < v2Index; ++i) {
             v2Out = v2Out.getNext().get();
@@ -456,7 +456,7 @@ public class Mesh {
             return new ImList<HalfEdge>();
         }
         ImList<HalfEdge> edges = new ImList<HalfEdge>();
-        HalfEdge start = (HalfEdge) f.getHalfEdge().get();
+        HalfEdge start = f.getHalfEdge().get();
         HalfEdge curr = start;
         do {
             edges = edges.add(curr);
@@ -470,7 +470,7 @@ public class Mesh {
             return new ImList<HalfEdge>();
         }
         ImList<HalfEdge> edges = new ImList<HalfEdge>();
-        HalfEdge start = (HalfEdge) v.getHalfEdge().get();
+        HalfEdge start = v.getHalfEdge().get();
         HalfEdge curr = start;
         do {
             edges = edges.add(curr);

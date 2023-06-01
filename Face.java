@@ -2,24 +2,24 @@ import java.util.Optional;
 
 class Face {
     private final int id;
-    private Optional<IHalfEdge> halfedge;
+    private Optional<HalfEdge> halfedge;
 
     Face(int id) {
         this.id = id;
-        this.halfedge = Optional.<IHalfEdge>empty();
+        this.halfedge = Optional.<HalfEdge>empty();
     }
 
-    private Face(int id, Optional<IHalfEdge> halfedge) {
+    private Face(int id, Optional<HalfEdge> halfedge) {
         this.id = id;
         this.halfedge = halfedge;
     }
 
-    void setHalfEdge(IHalfEdge halfedge) {
-        this.halfedge = Optional.<IHalfEdge>of(halfedge);
+    void setHalfEdge(HalfEdge halfedge) {
+        this.halfedge = Optional.<HalfEdge>of(halfedge);
     }
 
     void removeHalfEdge() {
-        this.halfedge = Optional.<IHalfEdge>empty();
+        this.halfedge = Optional.<HalfEdge>empty();
     }
 
     Face copy() {
@@ -30,13 +30,13 @@ class Face {
         return this.id;
     }
 
-    public Optional<IHalfEdge> getHalfEdge() {
+    public Optional<HalfEdge> getHalfEdge() {
         return this.halfedge;
     }
 
     @Override
     public String toString() {
-        IHalfEdge edge = () -> -1;
+        HalfEdge edge = new HalfEdge(-1);
         return String.format("Face %d: Edge %d", this.id,
                 this.halfedge.orElse(edge).getId());
     }

@@ -3,20 +3,20 @@ import java.util.Optional;
 class Vertex {
     private final int id;
     private final Point p;
-    private Optional<IHalfEdge> halfedge;
+    private Optional<HalfEdge> halfedge;
 
     Vertex(int id, Point p) {
-        this(id, p, Optional.<IHalfEdge>empty());
+        this(id, p, Optional.<HalfEdge>empty());
     }
 
-    private Vertex(int id, Point p, Optional<IHalfEdge> halfedge) {
+    private Vertex(int id, Point p, Optional<HalfEdge> halfedge) {
         this.id = id;
         this.p = p;
         this.halfedge = halfedge;
     }
 
-    void setHalfEdge(IHalfEdge halfedge) {
-        this.halfedge = Optional.<IHalfEdge>of(halfedge);
+    void setHalfEdge(HalfEdge halfedge) {
+        this.halfedge = Optional.<HalfEdge>of(halfedge);
     }
 
     Vertex copy() {
@@ -35,13 +35,13 @@ class Vertex {
         return this.p;
     }
 
-    public Optional<IHalfEdge> getHalfEdge() {
+    public Optional<HalfEdge> getHalfEdge() {
         return this.halfedge;
     }
 
     @Override
     public String toString() {
-        IHalfEdge edge = () -> -1;
+        HalfEdge edge = new HalfEdge(-1);
         return String.format("Vertex %d: %s, Edge %d", this.id, this.p.toString(),
                 this.halfedge.orElse(edge).getId());
     }
