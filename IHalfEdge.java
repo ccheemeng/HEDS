@@ -1,3 +1,0 @@
-interface IHalfEdge {
-    int getId();
-}
