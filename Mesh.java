@@ -353,9 +353,9 @@ public class Mesh {
 
         v1In.setNext(newEdge1);
         v1Out.setPrev(newEdge2);
-        v1Out.setFace(newFace);
+        //v1Out.setFace(newFace);
         v2In.setNext(newEdge2);
-        v2In.setFace(newFace);
+        //v2In.setFace(newFace);
         v2Out.setPrev(newEdge1);
         newEdge1.setPrev(v1In);
         newEdge1.setNext(v2Out);
@@ -366,7 +366,14 @@ public class Mesh {
         newEdge2.setNext(v1Out);
         newEdge2.setTwin(newEdge1);
         newEdge2.setVertex(v2);
-        newEdge2.setFace(newFace);
+        //newEdge2.setFace(newFace);
+
+        HalfEdge start = v1Out;
+        HalfEdge curr = start;
+        do {
+            curr.setFace(newFace);
+            curr = curr.getNext().get();
+        } while (!start.equals(curr));
 
         mesh = new Mesh(mesh.vertices, mesh.faces.add(newFace),
                 mesh.edges.addAll(List.of(newEdge1, newEdge2)));
