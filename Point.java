@@ -71,6 +71,6 @@ public class Point {
     public Point lerp(Point other, double ratio) {
         double diffX = other.x - this.x;
         double diffY = other.y - this.y;
-        return new Point(ratio * diffX, ratio * diffY);
+        return new Point(ratio * diffX + this.x, ratio * diffY + this.y);
     }
 }
