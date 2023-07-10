@@ -40,7 +40,7 @@ public class ImMap<K, V> implements Iterable<Map.Entry<K, V>> {
         return this.entrySet().iterator();
     }
 
-    Optional<V> get(Object key) {
+    public Optional<V> get(Object key) {
         return Optional.<V>ofNullable(this.map.get(key));
     }
 

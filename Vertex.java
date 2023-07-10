@@ -1,6 +1,6 @@
 import java.util.Optional;
 
-class Vertex {
+public class Vertex {
     private final int id;
     private final Point p;
     private Optional<HalfEdge> halfedge;
@@ -31,19 +31,19 @@ class Vertex {
         return this.id;
     }
 
-    Point getPoint() {
+    public Point getPoint() {
         return this.p;
     }
 
-    Optional<HalfEdge> getHalfEdge() {
+    public Optional<HalfEdge> getHalfEdge() {
         return this.halfedge;
     }
 
-    double getX() {
+    public double getX() {
         return this.p.getX();
     }
 
-    double getY() {
+    public double getY() {
         return this.p.getY();
     }
 
@@ -57,27 +57,27 @@ class Vertex {
                 this.p.translateAngle(angle, dist), this.halfedge);
     }
 
-    double angle() {
+    public double angle() {
         return this.p.angle();
     }
 
-    double angleBetween(Vertex other) {
+    public double angleBetween(Vertex other) {
         return this.p.angleBetween(other.p);
     }
 
-    double distanceBetween(Vertex other) {
+    public double distanceBetween(Vertex other) {
         return this.p.distanceBetween(other.p);
     }
 
-    double distanceFromOrigin() {
+    public double distanceFromOrigin() {
         return this.p.distanceFromOrigin();
     }
 
-    Point midpoint(Vertex other) {
+    public Point midpoint(Vertex other) {
         return this.p.midpoint(other.p);
     }
 
-    Point lerp(Vertex other, double ratio) {
+    public Point lerp(Vertex other, double ratio) {
         return this.p.lerp(other.p, ratio);
     }
 

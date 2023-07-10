@@ -1,6 +1,6 @@
 import java.util.Optional;
 
-class HalfEdge {
+public class HalfEdge {
     private final int id;
     private Optional<Vertex> v;
     private Optional<Face> f;
@@ -60,27 +60,27 @@ class HalfEdge {
         return this.id;
     }
 
-    Optional<Vertex> getVertex() {
+    public Optional<Vertex> getVertex() {
         return this.v;
     }
 
-    Optional<Face> getFace() {
+    public Optional<Face> getFace() {
         return this.f;
     }
 
-    Optional<HalfEdge> getTwin() {
+    public Optional<HalfEdge> getTwin() {
         return this.twin;
     }
 
-    Optional<HalfEdge> getNext() {
+    public Optional<HalfEdge> getNext() {
         return this.next;
     }
 
-    Optional<HalfEdge> getPrev() {
+    public Optional<HalfEdge> getPrev() {
         return this.prev;
     }
 
-    double angle() {
+    public double angle() {
         if (this.next.isEmpty() || this.v.isEmpty() ||
                 this.next.get().v.isEmpty()) {
             return 2 * Math.PI;
@@ -88,20 +88,24 @@ class HalfEdge {
         Vertex v1 = this.v.get();
         Vertex v2 = this.next.get().v.get();
         return v2.translateAngle(v1.angle() + Math.PI,
-                v1.distanceFromOrigin()).angle();
+                v1.distanceFromOrigin()).angle() % (2 * Math.PI);
     }
 
-    double angleBetween(HalfEdge other) {
+    public double angleBetween(HalfEdge other) {
         if (this.next.isEmpty() || this.v.isEmpty() ||
                 this.next.get().v.isEmpty() ||
                 other.next.isEmpty() || other.v.isEmpty() ||
                 other.next.get().v.isEmpty()) {
             return 2 * Math.PI;
         }
-        return other.angle() - this.angle();
+        double angle = other.angle() - this.angle();
+        if (angle < 0) {
+            angle += 2 * Math.PI;
+        }
+        return angle;
     }
 
-    double length() {
+    public double length() {
         if (this.next.isEmpty() || this.v.isEmpty() ||
                 this.next.get().v.isEmpty()) {
             return -1.0;
@@ -110,7 +114,7 @@ class HalfEdge {
                 this.next.get().v.get());
     }
 
-    Point midpoint() {
+    public Point midpoint() {
         if (this.next.isEmpty() || this.next.get().v.isEmpty()) {
             if (this.v.isEmpty()) {
                 return Point.origin();
@@ -121,7 +125,7 @@ class HalfEdge {
                 this.next.get().v.get());
     }
 
-    Point lerp(double ratio) {
+    public Point lerp(double ratio) {
         if (this.next.isEmpty() || this.next.get().v.isEmpty()) {
             if (this.v.isEmpty()) {
                 return Point.origin();

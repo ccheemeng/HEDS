@@ -1,6 +1,6 @@
 import java.util.Optional;
 
-class Face {
+public class Face {
     private final int id;
     private Optional<HalfEdge> halfedge;
 

@@ -1,6 +1,5 @@
 import java.util.List;
 import java.util.Optional;
-import java.lang.IndexOutOfBoundsException;
 
 /**
  * Derived from
@@ -18,8 +17,8 @@ public class Mesh {
      * @param points a {@code List} of {@code Point} for each vertex in the mesh.
      * @param faces  a {@code List} of a {@code List} of integers for the indices of each vertex in each face.
      */
-    public Mesh(List<? extends Point> points,
-            List<? extends List<? extends Integer>> faces) {
+    public Mesh(ImList<? extends Point> points,
+            ImList<? extends ImList<? extends Integer>> faces) {
         ImList<Vertex> newVertices = new ImList<Vertex>();
         ImList<Face> newFaces = new ImList<Face>();
         ImList<HalfEdge> newEdges = new ImList<HalfEdge>();
@@ -30,7 +29,7 @@ public class Mesh {
             newVertices = newVertices.add(v);
         }
         
-        for (List<? extends Integer> f : faces) {
+        for (ImList<? extends Integer> f : faces) {
             ImList<HalfEdge> faceEdges = new ImList<HalfEdge>();
             for (int i = 0; i < f.size(); ++i) {
                 int i2 = i < f.size() - 1 ? i + 1 : 0;
@@ -107,6 +106,10 @@ public class Mesh {
         this.vertices = newVertices;
         this.faces = newFaces;
         this.edges = newEdges;
+    }
+
+    protected Mesh(Mesh m) {
+        this(m.vertices, m.faces, m.edges);
     }
 
     private Mesh(ImList<Vertex> vertices, ImList<Face> faces, ImList<HalfEdge> edges) {
@@ -198,10 +201,9 @@ public class Mesh {
         return mesh;
     }
 
-    public Mesh moveVertex(int i, Point p) {
-        try {
-            this.vertices.get(i);
-        } catch (IndexOutOfBoundsException e) {
+    public Mesh moveVertex(Vertex v, Point p) {
+        int i = this.vertices.indexOf(v);
+        if (i == -1) {
             return this;
         }
         Mesh mesh = this.copy();
@@ -218,17 +220,16 @@ public class Mesh {
         return mesh;
     }
 
-    public Mesh splitEdgeMakeVert(int edgeIndex, Point vertexPoint) {
-        try {
-            this.edges.get(edgeIndex);
-        } catch (IndexOutOfBoundsException e) {
+    public Mesh splitEdgeMakeVert(HalfEdge e, Point vertexPoint) {
+        int i = this.edges.indexOf(e);
+        if (i == -1) {
             return this;
         }
         Vertex newVertex = new Vertex(this.vertices.size(), vertexPoint);
         HalfEdge v2In = new HalfEdge(this.edges.size());
         HalfEdge v1In = new HalfEdge(this.edges.size() + 1);
         Mesh mesh = this.copy();
-        HalfEdge v1Out = mesh.edges.get(edgeIndex);
+        HalfEdge v1Out = mesh.edges.get(i);
         HalfEdge v2Out = v1Out.getTwin().get();
         Vertex v1 = v1Out.getVertex().get();
         Vertex v2 = v2Out.getVertex().get();
@@ -261,13 +262,11 @@ public class Mesh {
         return mesh;
     }
     
-    public Mesh joinEdgeKillVert(int i) {
-        try {
-            this.vertices.get(i);
-        } catch (IndexOutOfBoundsException e) {
+    public Mesh joinEdgeKillVert(Vertex v) {
+        int i = this.vertices.indexOf(v);
+        if (i == -1) {
             return this;
         }
-        Vertex v = this.vertices.get(i);
         int count = 0;
         HalfEdge start = v.getHalfEdge().get();
         HalfEdge curr = start;
@@ -313,49 +312,50 @@ public class Mesh {
         return mesh;
     }
 
-    public Mesh splitFaceMakeEdge(int faceIndex, int v1Index, int v2Index) {
-        try {
-            Face f = this.faces.get(faceIndex);
-            getFaceHalfEdges(f).get(v1Index);
-            getFaceHalfEdges(f).get(v2Index);
-        } catch (IndexOutOfBoundsException e) {
+    public Mesh splitFaceMakeEdge(Face face, Vertex vertex1, Vertex vertex2) {
+        int faceIndex = this.faces.indexOf(face);
+        int v1Index = this.vertices.indexOf(vertex1);
+        int v2Index = this.vertices.indexOf(vertex2);
+        if (faceIndex == -1 || v1Index == -1 || v2Index == -1) {
             return this;
         }
-        if (Math.abs(v1Index - v2Index) < 2 ||
-                getFaceHalfEdges(faceIndex).size() <= 3) {
+        if (getFaceHalfEdges(face).size() <= 3) {
+            return this;
+        }
+        boolean v1OnFace = false;
+        int v1OutIndex = 0;
+        boolean v2OnFace = false;
+        int v2OutIndex = 0;
+        for (HalfEdge e : getFaceHalfEdges(face)) {
+            if (e.getVertex().get().equals(vertex1)) {
+                v1OnFace = true;
+                v1OutIndex = this.edges.indexOf(e);
+            } else if (e.getVertex().get().equals(vertex2)) {
+                v2OnFace = true;
+                v2OutIndex = this.edges.indexOf(e);
+            }
+        }
+        if (!(v1OnFace && v2OnFace)) {
             return this;
         }
         Face newFace = new Face(this.faces.size());
         HalfEdge newEdge1 = new HalfEdge(this.edges.size());
         HalfEdge newEdge2 = new HalfEdge(this.edges.size() + 1);
         Mesh mesh = this.copy();
-        Face f = mesh.faces.get(faceIndex);
-        Vertex v1 = getFaceHalfEdges(f)
-            .get(v1Index).getVertex().get();
-        Vertex v2 = getFaceHalfEdges(f)
-            .get(v2Index).getVertex().get();
-        HalfEdge v1Out = f.getHalfEdge().get();
-        HalfEdge v1In = v1Out.getPrev().get();
-        for (int i = 0; i < v1Index; ++i) {
-            v1Out = v1Out.getNext().get();
-            v1In = v1Out.getPrev().get();
-        }
-        HalfEdge v2Out = f.getHalfEdge().get();
-        HalfEdge v2In = v2Out.getPrev().get();
-        for (int i = 0; i < v2Index; ++i) {
-            v2Out = v2Out.getNext().get();
-            v2In = v2Out.getPrev().get();
-        }
         Face oldFace = mesh.faces.get(faceIndex);
+        Vertex v1 = mesh.vertices.get(v1Index);
+        Vertex v2 = mesh.vertices.get(v2Index);
+        HalfEdge v1Out = mesh.edges.get(v1OutIndex);
+        HalfEdge v1In = v1Out.getPrev().get();
+        HalfEdge v2Out = mesh.edges.get(v2OutIndex);
+        HalfEdge v2In = v2Out.getPrev().get();
         
         oldFace.setHalfEdge(newEdge1);
         newFace.setHalfEdge(newEdge2);
 
         v1In.setNext(newEdge1);
         v1Out.setPrev(newEdge2);
-        //v1Out.setFace(newFace);
         v2In.setNext(newEdge2);
-        //v2In.setFace(newFace);
         v2Out.setPrev(newEdge1);
         newEdge1.setPrev(v1In);
         newEdge1.setNext(v2Out);
@@ -366,7 +366,6 @@ public class Mesh {
         newEdge2.setNext(v1Out);
         newEdge2.setTwin(newEdge1);
         newEdge2.setVertex(v2);
-        //newEdge2.setFace(newFace);
 
         HalfEdge start = v1Out;
         HalfEdge curr = start;
@@ -381,13 +380,12 @@ public class Mesh {
         return mesh;
     }
  
-    public Mesh joinFaceKillEdge(int i) {
-        Mesh mesh = this.copy();
-        try {
-            mesh.edges.get(i);
-        } catch (IndexOutOfBoundsException e) {
-            return mesh;
+    public Mesh joinFaceKillEdge(HalfEdge edge) {
+        int i = this.edges.indexOf(edge);
+        if (i == -1) {
+            return this;
         }
+        Mesh mesh = this.copy();
         HalfEdge v1Out = mesh.edges.get(i);
         HalfEdge v2Out = v1Out.getTwin().get();
         if (v1Out.getFace().isEmpty() || v2Out.getFace().isEmpty()) {
@@ -435,30 +433,8 @@ public class Mesh {
         mesh.check();
         return mesh;
     }
-
-    public ImList<HalfEdge> getFaceHalfEdges(int i) {
-        try {
-            this.faces.get(i);
-        } catch (IndexOutOfBoundsException e) {
-            return new ImList<HalfEdge>();
-        }
-        Mesh mesh = this.copy();
-        Face f = mesh.faces.get(i);
-        return mesh.getFaceHalfEdges(f);
-    }
     
-    public ImList<HalfEdge> getVertexHalfEdges(int i) {
-        try {
-            this.vertices.get(i);
-        } catch (IndexOutOfBoundsException e) {
-            return new ImList<HalfEdge>();
-        }
-        Mesh mesh = this.copy();
-        Vertex v = mesh.vertices.get(i);
-        return mesh.getVertexHalfEdges(v);
-    }
-
-    private ImList<HalfEdge> getFaceHalfEdges(Face f) {
+    public ImList<HalfEdge> getFaceHalfEdges(Face f) {
         if (f.getHalfEdge().isEmpty()) {
             return new ImList<HalfEdge>();
         }
@@ -472,7 +448,7 @@ public class Mesh {
         return edges;
     }
     
-    private ImList<HalfEdge> getVertexHalfEdges(Vertex v) {
+    public ImList<HalfEdge> getVertexHalfEdges(Vertex v) {
         if (v.getHalfEdge().isEmpty()) {
             return new ImList<HalfEdge>();
         }
@@ -487,27 +463,24 @@ public class Mesh {
     }
 
     public ImList<Vertex> getVertices() {
-        Mesh mesh = this.copy();
         ImList<Vertex> vertices = new ImList<Vertex>();
-        for (Vertex v : mesh.vertices) {
+        for (Vertex v : this.vertices) {
             vertices = vertices.add(v);
         }
         return vertices;
     }
 
     public ImList<Face> getFaces() {
-        Mesh mesh = this.copy();
         ImList<Face> faces = new ImList<Face>();
-        for (Face f : mesh.faces) {
+        for (Face f : this.faces) {
             faces = faces.add(f);
         }
         return faces;
     }
 
     public ImList<HalfEdge> getHalfEdges() {
-        Mesh mesh = this.copy();
         ImList<HalfEdge> edges = new ImList<HalfEdge>();
-        for (HalfEdge e : mesh.edges) {
+        for (HalfEdge e : this.edges) {
             edges = edges.add(e);
         }
         return edges;
